@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const DATA = path.join(__dirname, 'data');
+const DATA = process.env.DATA_DIR || path.join(__dirname, 'data');
 fs.mkdirSync(DATA, { recursive: true });
 const USERS_FILE = path.join(DATA, 'users.json');
 const SETTINGS_FILE = path.join(DATA, 'settings.json');

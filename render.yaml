@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: aus-customer-dashboard
+    runtime: node
+    plan: starter
+    region: singapore
+    buildCommand: "true"
+    startCommand: node server.js
+    healthCheckPath: /login.html
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /var/data
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: NODE_VERSION
+        value: "20"
+      - key: SHOPIFY_SHOP
+        sync: false
+      - key: SHOPIFY_CLIENT_ID
+        sync: false
+      - key: SHOPIFY_CLIENT_SECRET
+        sync: false
+      - key: SHOPIFY_API_VERSION
+        value: "2025-10"
