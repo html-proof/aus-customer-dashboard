@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PixMagic Insights</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>window.DEMO=true</script><script src="demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--g:#0f7a5c;--g2:#13a079;--gl:#e6f4ee;--bg:#f6f8f7;--card:#fff;--line:#e7ecea;--tx:#132a22;--mu:#6b7a74;--red:#e03d3d;--or:#e8a317;--orl:#fff5dc}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx);font-size:14px}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside{background:#fff;border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column}
+.logo{font-weight:700;font-size:24px;padding:0 10px;display:flex;gap:8px;align-items:center}.logo small{display:block;font-weight:400;font-size:15px;color:var(--mu)}
+.store{margin:18px 4px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-weight:600}.store small{display:block;color:var(--mu);font-weight:400;font-size:12px}
+nav a{display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:8px;color:var(--tx);text-decoration:none;margin:2px 0;cursor:pointer}
+nav a.active,nav a:hover{background:var(--gl);color:var(--g)}
+.priv{margin-top:auto;border-top:1px solid var(--line);padding:14px 10px 0;font-weight:600}.priv small{display:block;font-weight:400;color:var(--mu);font-size:12px;margin-top:4px}
+main{padding:22px 28px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:30px}.sub{color:var(--mu);font-size:16px;margin-top:4px}
+.btn{border:1px solid var(--line);background:#fff;padding:10px 16px;border-radius:8px;font:inherit;font-weight:500;cursor:pointer}
+.btn.pri{background:var(--g);color:#fff;border-color:var(--g)}.btn:disabled{opacity:.6}
+.live{color:var(--mu);font-size:12px;text-align:right;margin-bottom:8px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--g2);margin-right:6px}
+.filters{display:flex;gap:10px;margin:18px 0;flex-wrap:wrap;align-items:center}
+.seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px}
+.seg button{border:0;background:none;padding:8px 18px;border-radius:7px;font:inherit;cursor:pointer}.seg button.on{background:var(--g);color:#fff}
+.filters input[type=date]{border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit}
+.chk{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;gap:8px;align-items:center}
+.tz{margin-left:auto;color:var(--mu)}
+.grid{display:grid;gap:18px}.k4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1.5fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;min-width:0}
+.card h3{margin:0 0 14px;font-size:16px;display:flex;justify-content:space-between}
+.kv{font-size:30px;font-weight:700;margin:4px 0 8px}
+.chg{display:inline-block;padding:3px 9px;border-radius:14px;font-size:12px;font-weight:600;background:var(--gl);color:var(--g)}.chg.neg{background:#fde8e8;color:var(--red)}
+.vs{color:var(--mu);font-size:12px;margin-left:6px}
+.spark{height:50px;margin-top:10px}
+.bar{height:22px;background:#eef2f0;border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g)}
+.frow{display:grid;grid-template-columns:120px 60px 1fr 44px;gap:12px;align-items:center;margin:14px 0}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--mu);font-weight:500;font-size:12px;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:11px 6px;border-bottom:1px solid var(--line)}td.r,th.r{text-align:right}
+.on-name{color:var(--g);font-weight:600}
+.av{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#eef2f0;font-size:11px;font-weight:600}
+.pill{padding:3px 9px;border-radius:12px;font-size:12px;background:var(--gl);color:var(--g);white-space:nowrap}.pill.w{background:var(--orl);color:#b57b00}.pill.b{background:#fde8e8;color:var(--red)}
+.prow{display:grid;grid-template-columns:40px 1fr 50px 1fr 40px;gap:12px;align-items:center;margin:10px 0}
+.prow img,.ph{width:40px;height:34px;object-fit:cover;border-radius:4px;background:#eef2f0}
+.lrow{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.lrow:last-child{border:0}
+.health{display:flex;gap:24px;flex-wrap:wrap;align-items:center}.health div small{display:block;font-size:12px}
+.ok{color:var(--g)}.warn{color:var(--or)}.bad{color:var(--red)}
+.mu{color:var(--mu)}.err{background:#fde8e8;color:var(--red);padding:12px 16px;border-radius:10px;margin-bottom:16px;display:none}
+.na{color:var(--mu);font-size:13px;padding:10px 0}
+.loading{opacity:.5;transition:opacity .2s}
+.form label{display:block;font-size:13px;font-weight:500;margin:0 0 14px}
+.form input:not([type=checkbox]),.form select{display:block;width:100%;margin-top:6px;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}
+.form label.inline{display:flex;gap:8px;align-items:center}
+.ok-msg{background:var(--gl);color:var(--g);padding:12px 16px;border-radius:10px;margin-top:16px;display:none}
+.scope{display:inline-block;background:#eef2f0;border-radius:6px;padding:3px 8px;margin:3px 4px 0 0;font-size:12px;font-family:ui-monospace,monospace}
+body.viewer .admin-only{display:none!important}body:not(.viewer) .viewer-only{display:none}
+select.btn{padding:9px 12px}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mu);font-size:12px;margin-top:18px}
+/* Icons, header chrome, menus */
+.ic{flex:none;vertical-align:middle}
+.kt{display:inline-flex;align-items:center;gap:10px;font-weight:500}
+.card h3{align-items:center}.card h3 .kt{font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.link{display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;text-decoration:none}
+nav a .ic{color:var(--tx)}nav a.active .ic,nav a:hover .ic{color:var(--g)}
+.store{display:flex;align-items:center;gap:10px;width:100%;margin:0;background:#fff;font:inherit;font-weight:600;cursor:pointer;color:var(--tx)}
+.flag{font-size:22px;line-height:1}
+.priv{display:block;text-decoration:none;color:var(--tx);cursor:pointer}
+.topbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:-8px 0 6px}
+.topnote{font-size:12px;margin-right:auto}
+.iconbtn{position:relative;border:0;background:none;padding:8px;border-radius:8px;cursor:pointer;color:var(--tx);display:inline-grid;place-items:center}
+.iconbtn:hover{background:var(--gl)}
+.dot-badge{position:absolute;top:6px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid #fff}
+.avatar{width:38px;height:38px;border-radius:50%;border:0;background:#0f3d31;color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.pop-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + 6px);z-index:40;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px #0f2a2214;min-width:220px;overflow:hidden}
+aside .menu{left:0;right:0}
+.menu.wide{width:min(360px,calc(100vw - 32px))}
+.mi{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 12px;font:inherit;text-align:left;cursor:pointer;color:var(--tx);text-decoration:none}
+.mi:hover{background:var(--gl)}
+.tz select{border:0;background:none;font:inherit;font-weight:500;color:var(--tx);cursor:pointer}
+#cmpLabel{cursor:pointer;user-select:none}#cmpLabel:has(input:checked){border-color:var(--g);color:var(--g);background:var(--gl)}
+.donut-c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}.donut-c b{font-size:22px}.donut-c small{font-size:10px;color:var(--mu)}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+.health{justify-content:space-between}.hitem{text-decoration:none;color:var(--tx);cursor:pointer;padding:6px 18px;border-left:1px solid var(--line)}
+/* Date range picker */
+.dp-btn{display:inline-flex;align-items:center;gap:10px;min-width:190px;justify-content:space-between}
+.dp{position:absolute;z-index:45;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px #0f2a221f;padding:16px;width:max-content;max-width:calc(100vw - 32px)}
+.dp-months{display:flex;gap:24px}.dp-month{min-width:230px}.dp-month+.dp-month{border-left:1px solid var(--line);padding-left:24px}
+.dp-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;margin-bottom:10px}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:4px;text-align:center;font-size:13px}
+.dp-grid .dow{color:var(--mu);font-size:11px;padding:4px 0}
+.dp-day{border:0;background:none;font:inherit;padding:0;height:30px;cursor:pointer;color:var(--tx)}
+.dp-day span{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%}
+.dp-day.in{background:var(--gl)}.dp-day.start{border-radius:15px 0 0 15px}.dp-day.end{border-radius:0 15px 15px 0}.dp-day.start.end{border-radius:15px}
+.dp-day.start span,.dp-day.end span{background:var(--g);color:#fff}
+.dp-day:disabled{color:#c3ccc8;cursor:default}.dp-day.today span{outline:1px solid var(--g)}
+.dp-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+/* Mobile */
+.mobile-only{display:none}
+.scrim{position:fixed;inset:0;background:#0006;z-index:59}
+@media(max-width:1100px){.k4{grid-template-columns:repeat(2,1fr)}.g2,.g3{grid-template-columns:1fr}.hitem{border:0;padding:6px 0}}
+@media(max-width:800px){
+  .app{grid-template-columns:1fr}
+  .mobile-only{display:inline-grid}.scrim.mobile-only{display:block}.scrim[hidden]{display:none!important}
+  aside{position:fixed;inset:0 auto 0 0;width:min(280px,85vw);z-index:60;transform:translateX(-105%);transition:transform .2s;overflow:auto}
+  body.nav-open aside{transform:none}
+  main{padding:14px 16px}.k4{grid-template-columns:1fr}.tz{margin-left:0}
+  .dp-months{flex-direction:column}.dp-month+.dp-month{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:12px}
+  h1{font-size:24px}.kv{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside id="sidebar">
+  <div class="logo">
+    <svg width="34" height="22" viewBox="0 0 34 22" aria-hidden="true"><path d="M0 22 11 4l6 9 4-6 13 15z" fill="#0f7a5c"/><path d="M11 4l6 9-3 4z" fill="#13a079"/></svg>
+    <div>PixMagic<small>Insights</small></div>
+    <button class="iconbtn mobile-only" id="menuClose" aria-label="Close menu" style="margin-left:auto"><i data-ic="close"></i></button>
+  </div>
+  <div class="pop-wrap" style="margin:18px 4px">
+    <button class="store" id="storeBtn" aria-haspopup="true">
+      <span class="flag" aria-hidden="true">🇦🇺</span>
+      <span id="storeBox" style="flex:1;text-align:left">PixMagic<small>Loading…</small></span>
+      <i data-ic="chevron" data-size="16"></i>
+    </button>
+    <div class="menu" id="storeMenu" hidden></div>
+  </div>
+  <nav>
+    <a class="active" data-t="top"><i data-ic="home"></i>Overview</a>
+    <a data-v="orders"><i data-ic="orders"></i>Orders</a>
+    <a data-v="products"><i data-ic="bag"></i>Products &amp; inventory</a>
+    <a data-v="customers"><i data-ic="user"></i>Customers</a>
+    <a data-v="journey"><i data-ic="pulse"></i>Customer journey</a>
+    <a data-v="payments"><i data-ic="card"></i>Payments &amp; refunds</a>
+    <a data-v="attention"><i data-ic="alert"></i>Needs attention <span class="pill b" id="atBadge" hidden style="margin-left:auto"></span></a>
+    <a data-v="marketing"><i data-ic="megaphone"></i>Marketing</a>
+    <a data-v="reports"><i data-ic="bars"></i>Reports</a>
+    <a data-v="connections"><i data-ic="link"></i>Data connections</a>
+    <a data-v="settings"><i data-ic="gear"></i>Settings</a>
+  </nav>
+  <a class="priv" data-v="settings" id="privLink">
+    <span style="display:flex;align-items:center;gap:10px"><i data-ic="lock"></i>Private workspace<i data-ic="chevronR" data-size="16" style="margin-left:auto"></i></span>
+    <small>Only your team can access this data.</small>
+  </a>
+</aside>
+<div class="scrim mobile-only" id="scrim" hidden></div>
+<main>
+<div class="topbar">
+  <button class="iconbtn mobile-only" id="menuBtn" aria-label="Open menu"><i data-ic="menu"></i></button>
+  <span class="mu topnote"><span class="dot"></span><span id="updated">Connecting to Shopify…</span></span>
+  <div class="pop-wrap">
+    <button class="iconbtn" id="bellBtn" aria-label="Notifications" aria-haspopup="true"><i data-ic="bell"></i><span class="dot-badge" id="bellDot" hidden></span></button>
+    <div class="menu wide" id="bellMenu" hidden></div>
+  </div>
+  <div class="pop-wrap">
+    <button class="avatar" id="meAv" aria-label="Account menu" aria-haspopup="true">·</button>
+    <div class="menu" id="meMenu" hidden>
+      <div style="padding:10px 12px;border-bottom:1px solid var(--line)"><b id="meName">Signed in</b><br><small class="mu" id="meRole"></small></div>
+      <button class="mi" data-go="settings"><i data-ic="gear" data-size="16"></i>Settings</button>
+      <button class="mi" id="logoutBtn"><i data-ic="logout" data-size="16"></i>Sign out</button>
+    </div>
+  </div>
+</div>
+<section id="view-overview">
+  <div class="top" id="top">
+    <div><h1>Overview</h1><div class="sub">Understand your store at a glance</div></div>
+    <div class="actions">
+      <button class="btn" id="exportBtn"><i data-ic="download" data-size="18"></i>Export report</button>
+      <button class="btn pri" id="refreshBtn"><i data-ic="refresh" data-size="18"></i>Refresh</button>
+    </div>
+  </div>
+  <div class="filters">
+    <div class="seg" id="seg"><button data-p="day">Day</button><button data-p="month" class="on">Month</button><button data-p="year">Year</button><button data-p="custom">Custom</button></div>
+    <input type="date" id="from" data-range="to"> <input type="date" id="to">
+    <label class="chk" id="cmpLabel"><input type="checkbox" id="cmp" checked hidden><i data-ic="bars" data-size="18"></i>Compare previous period</label>
+    <label class="tz">Timezone: <select id="tzSel" aria-label="Display timezone"></select></label>
+  </div>
+  <div class="err" id="err"></div>
+
+  <div id="content">
+  <div class="grid k4">
+    <div class="card"><div class="kt"><i data-ic="cart"></i>Total sales</div><div class="kv" id="kSales">–</div><span id="cSales"></span><div class="spark"><canvas id="s1"></canvas></div></div>
+    <div class="card"><div class="kt"><i data-ic="orders"></i>Orders</div><div class="kv" id="kOrders">–</div><span id="cOrders"></span><div class="spark"><canvas id="s2"></canvas></div></div>
+    <div class="card"><div class="kt"><i data-ic="tag"></i>Average order value</div><div class="kv" id="kAov">–</div><span id="cAov"></span><div class="spark"><canvas id="s3"></canvas></div></div>
+    <div class="card"><div class="kt"><i data-ic="users"></i>Returning customers</div><div class="kv" id="kRet">–</div><span id="cRet"></span><div class="spark"><canvas id="s4"></canvas></div></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card"><h3><span class="kt"><i data-ic="bars"></i>Sales trend</span></h3><div style="height:260px"><canvas id="trend"></canvas></div></div>
+    <div class="card" id="journey"><h3><span class="kt"><i data-ic="funnel"></i>Customer journey</span><a class="on-name link" data-go="journey">View <i data-ic="arrowR" data-size="16"></i></a></h3><div id="journeyBody"></div></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card" id="orders"><h3><span class="kt"><i data-ic="orders"></i>Recent orders</span><a class="on-name link" id="allOrders" href="#">View all <i data-ic="arrowR" data-size="16"></i></a></h3>
+      <div style="overflow:auto"><table><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Payment status</th><th>Fulfilment status</th><th class="r">Total</th></tr></thead><tbody id="ordersBody"></tbody></table></div></div>
+    <div class="card" id="products"><h3><span class="kt"><i data-ic="box"></i>Best-selling products</span><a class="on-name link" id="allProducts" href="#">View all <i data-ic="arrowR" data-size="16"></i></a></h3><div id="prodBody"></div></div>
+  </div>
+
+  <div class="grid g3" style="margin-top:18px">
+    <div class="card" id="payments"><h3><span class="kt"><i data-ic="card"></i>Payments &amp; refunds</span><a class="on-name link" data-go="payments">View <i data-ic="arrowR" data-size="16"></i></a></h3><div id="payBody"></div></div>
+    <div class="card" id="customers"><h3><span class="kt"><i data-ic="user"></i>Customers</span><a class="on-name link" data-go="customers">View <i data-ic="arrowR" data-size="16"></i></a></h3><div id="custBody" style="display:flex;gap:20px;align-items:center"></div></div>
+    <div class="card" id="attention"><h3><span class="kt"><i data-ic="alert" style="color:var(--or)"></i>Needs attention</span></h3><div id="attBody"></div></div>
+  </div>
+
+  <div class="card" id="health" style="margin-top:18px"><div class="health" id="healthBody"></div></div>
+  </div>
+</section>
+<section id="view-marketing" hidden>
+  <div class="top">
+    <div><h1>Marketing</h1><div class="sub">Where your sales come from and which promotions work</div></div>
+    <div><button class="btn" id="mkExport">⤓ Export CSV</button> <button class="btn pri" id="mkRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="filters">
+    <div class="seg" id="mkSeg"><button data-d="7">7 days</button><button data-d="30" class="on">30 days</button><button data-d="90">90 days</button><button data-d="365">12 months</button></div>
+    <input type="date" id="mkFrom"> <span class="mu">to</span> <input type="date" id="mkTo">
+  </div>
+  <div class="err" id="mkErr"></div>
+  <div id="mkContent">
+    <div class="grid k4">
+      <div class="card"><div>🛒 Sales</div><div class="kv" id="mkSales">–</div></div>
+      <div class="card"><div>🏷 Orders using a discount</div><div class="kv" id="mkDisc">–</div><span class="vs" id="mkDiscPct"></span></div>
+      <div class="card"><div>💸 Total discounts given</div><div class="kv" id="mkDiscAmt">–</div></div>
+      <div class="card"><div>🛍 Abandoned checkouts</div><div class="kv" id="mkAband">–</div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Sales by traffic source</h3><div id="mkSources"></div></div>
+      <div class="card"><h3>Sales by channel</h3><div style="height:240px"><canvas id="mkChannels"></canvas></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Discount codes</h3><table><thead><tr><th>Code</th><th class="r">Uses</th><th class="r">Sales</th><th class="r">Discount given</th></tr></thead><tbody id="mkCodes"></tbody></table></div>
+      <div class="card"><h3>UTM campaigns</h3><table><thead><tr><th>Campaign</th><th class="r">Orders</th><th class="r">Sales</th></tr></thead><tbody id="mkUtm"></tbody></table></div>
+    </div>
+    <div class="card" style="margin-top:18px"><h3>Marketing activities in Shopify</h3><div id="mkCampaigns"></div></div>
+  </div>
+</section>
+
+<section id="view-reports" hidden>
+  <div class="top">
+    <div><h1>Reports</h1><div class="sub">Yearly performance, product and customer reports</div></div>
+    <div><select id="rpYear" class="btn"></select> <button class="btn pri" id="rpRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="err" id="rpErr" style="margin-top:16px"></div>
+  <div id="rpContent" style="margin-top:18px">
+    <div class="grid k4">
+      <div class="card"><div>Year sales</div><div class="kv" id="rpSales">–</div><span id="rpSalesChg"></span></div>
+      <div class="card"><div>Year orders</div><div class="kv" id="rpOrders">–</div><span id="rpOrdersChg"></span></div>
+      <div class="card"><div>Refunds</div><div class="kv" id="rpRefunds">–</div></div>
+      <div class="card"><div>Best month</div><div class="kv" id="rpBest">–</div></div>
+    </div>
+    <div class="card" style="margin-top:18px"><h3>Monthly sales vs previous year <button class="btn" data-csv="monthly">⤓ CSV</button></h3><div style="height:280px"><canvas id="rpMonthly"></canvas></div></div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Sales by day of week</h3><div style="height:220px"><canvas id="rpDow"></canvas></div></div>
+      <div class="card"><h3>Orders by hour of day</h3><div style="height:220px"><canvas id="rpHours"></canvas></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Sales by product <button class="btn" data-csv="products">⤓ CSV</button></h3><div style="max-height:420px;overflow:auto"><table><thead><tr><th>Product</th><th class="r">Units</th><th class="r">Orders</th><th class="r">Revenue</th></tr></thead><tbody id="rpProducts"></tbody></table></div></div>
+      <div class="card"><h3>Top customers <button class="btn" data-csv="customers">⤓ CSV</button></h3><div style="max-height:420px;overflow:auto"><table><thead><tr><th>Customer</th><th class="r">Orders</th><th class="r">Spent</th></tr></thead><tbody id="rpCustomers"></tbody></table></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Payment status</h3><div id="rpFin"></div></div>
+      <div class="card"><h3>Fulfilment status</h3><div id="rpFul"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-orders" hidden>
+  <div class="top">
+    <div><h1>Orders</h1><div class="sub">Every order, its payment and fulfilment status</div></div>
+    <div><button class="btn" id="orExport">⤓ Export CSV</button> <button class="btn pri" id="orRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="filters">
+    <div class="seg" id="orSeg"><button data-d="1">Today</button><button data-d="7">7 days</button><button data-d="30" class="on">30 days</button><button data-d="365">12 months</button></div>
+    <input type="date" id="orFrom"> <span class="mu">to</span> <input type="date" id="orTo">
+  </div>
+  <div class="err" id="orErr"></div>
+  <div id="orContent">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+      <div class="card"><div>📦 Orders</div><div class="kv" id="orTotal">–</div></div>
+      <div class="card" data-quick="fulfilment:unfulfilled" style="cursor:pointer"><div>🚚 Unfulfilled</div><div class="kv" id="orUnf">–</div><span class="vs" id="orOpenUnf"></span></div>
+      <div class="card" data-quick="payment:pending" style="cursor:pointer"><div>⏳ Payment pending</div><div class="kv" id="orPend">–</div></div>
+      <div class="card" data-quick="payment:refunded" style="cursor:pointer"><div>↺ Refunded</div><div class="kv" id="orRef">–</div></div>
+      <div class="card" data-quick="status:cancelled" style="cursor:pointer"><div>✖ Cancelled</div><div class="kv" id="orCan">–</div></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div class="filters" style="margin:0 0 12px">
+        <input id="orSearch" type="search" placeholder="Search order #, customer, product, email…" class="btn" style="flex:1;min-width:200px;text-align:left;cursor:text">
+        <select id="orPay" class="btn"><option value="">Any payment</option><option value="paid">Paid</option><option value="pending">Pending</option><option value="authorized">Authorised</option><option value="refunded">Refunded</option><option value="voided">Voided</option></select>
+        <select id="orFul" class="btn"><option value="">Any fulfilment</option><option value="unfulfilled">Unfulfilled</option><option value="partial">Partially fulfilled</option><option value="fulfilled">Fulfilled</option></select>
+        <select id="orStatus" class="btn"><option value="">Any status</option><option value="open">Open</option><option value="closed">Archived</option><option value="cancelled">Cancelled</option></select>
+        <select id="orSort" class="btn"><option value="newest">Newest first</option><option value="total">Highest value</option><option value="number">Order number</option></select>
+        <button class="btn" id="orClear" hidden>Clear filters</button>
+      </div>
+      <div style="overflow:auto"><table><thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Channel</th><th>Payment</th><th>Fulfilment</th><th class="r">Items</th><th class="r">Total</th></tr></thead><tbody id="orList"></tbody></table></div>
+      <button class="btn" id="orMore" style="margin-top:12px;width:100%" hidden>Load more</button>
+    </div>
+  </div>
+</section>
+
+<div id="orDrawer" hidden style="position:fixed;inset:0;background:#0006;z-index:50;display:flex;justify-content:flex-end">
+  <div style="background:#fff;width:min(560px,100%);height:100%;overflow:auto;padding:24px" id="orDetail"></div>
+</div>
+
+<section id="view-products" hidden>
+  <div class="top">
+    <div><h1>Products &amp; inventory</h1><div class="sub">What's selling, what isn't, and what's running low</div></div>
+    <div><button class="btn" id="prExport">⤓ Export CSV</button> <button class="btn pri" id="prRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="filters">
+    <span class="mu">Sales for</span>
+    <div class="seg" id="prSeg"><button data-d="7">7 days</button><button data-d="30" class="on">30 days</button><button data-d="90">90 days</button><button data-d="365">12 months</button></div>
+    <input type="date" id="prFrom"> <span class="mu">to</span> <input type="date" id="prTo">
+  </div>
+  <div class="err" id="prErr"></div>
+  <div class="card" id="prInvNote" hidden style="margin-bottom:18px">
+    <b>Stock levels aren't switched on yet.</b>
+    <span class="mu">Add the <code>read_inventory</code> permission to the Shopify app (Dev Dashboard → Versions → access scopes), release, approve it in the store admin, then press Refresh. Sales data below works already.</span>
+  </div>
+  <div id="prContent">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+      <div class="card"><div>🖼 Active products</div><div class="kv" id="prActive">–</div><span class="vs" id="prDraft"></span></div>
+      <div class="card"><div>📦 Units sold</div><div class="kv" id="prUnits">–</div><span class="vs" id="prSold"></span></div>
+      <div class="card" data-quick="sales:none" style="cursor:pointer"><div>😴 Not selling</div><div class="kv" id="prNone">–</div><span class="vs">active, no sales in period</span></div>
+      <div class="card" data-quick="stock:low" style="cursor:pointer"><div>⚠️ Low stock</div><div class="kv" id="prLow">–</div><span class="vs" id="prLowNote"></span></div>
+      <div class="card" data-quick="stock:out" style="cursor:pointer"><div>⛔ Out of stock</div><div class="kv" id="prOut">–</div></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <div class="filters" style="margin:0 0 12px">
+        <input id="prSearch" type="search" placeholder="Search products, SKU, type, vendor…" class="btn" style="flex:1;min-width:200px;text-align:left;cursor:text">
+        <select id="prStatus" class="btn"><option value="">Any status</option><option value="active" selected>Active</option><option value="draft">Draft</option><option value="archived">Archived</option></select>
+        <select id="prStock" class="btn"><option value="">Any stock</option><option value="low">Low stock</option><option value="out">Out of stock</option></select>
+        <select id="prSort" class="btn"><option value="title">Name A–Z</option><option value="newest">Newest</option><option value="updated">Recently updated</option><option value="stock">Lowest stock</option></select>
+        <label class="chk" style="padding:8px 12px"><input type="checkbox" id="prNoSales"> Only not selling</label>
+      </div>
+      <div style="overflow:auto"><table><thead><tr><th>Product</th><th>Status</th><th class="r">Price</th><th class="r">Stock</th><th class="r">Units sold</th><th class="r">Revenue</th></tr></thead><tbody id="prList"></tbody></table></div>
+      <button class="btn" id="prMore" style="margin-top:12px;width:100%" hidden>Load more</button>
+    </div>
+  </div>
+</section>
+
+<div id="prDrawer" hidden style="position:fixed;inset:0;background:#0006;z-index:50;display:flex;justify-content:flex-end">
+  <div style="background:#fff;width:min(600px,100%);height:100%;overflow:auto;padding:24px" id="prDetail"></div>
+</div>
+
+<section id="view-payments" hidden>
+  <div class="top">
+    <div><h1>Payments &amp; refunds</h1><div class="sub">Money collected, refunded, and anything that needs a look</div></div>
+    <div><button class="btn" id="paExport">⤓ Export CSV</button> <button class="btn pri" id="paRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="filters">
+    <div class="seg" id="paSeg"><button data-d="7">7 days</button><button data-d="30" class="on">30 days</button><button data-d="90">90 days</button><button data-d="365">12 months</button></div>
+    <input type="date" id="paFrom"> <span class="mu">to</span> <input type="date" id="paTo">
+  </div>
+  <div class="err" id="paErr"></div>
+  <div id="paContent">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+      <div class="card"><div>💳 Collected</div><div class="kv" id="paCollected">–</div><span class="vs" id="paSuccess"></span></div>
+      <div class="card"><div>↺ Refunded</div><div class="kv" id="paRefunded">–</div><span class="vs" id="paRefRate"></span></div>
+      <div class="card"><div>✅ Net payments</div><div class="kv" id="paNet">–</div></div>
+      <div class="card"><div>✖ Failed payments</div><div class="kv" id="paFailed">–</div></div>
+      <div class="card"><div>⏳ Awaiting capture</div><div class="kv" id="paAwait">–</div><span class="vs" id="paAwaitAmt"></span></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Collected vs refunded per day</h3><div style="height:260px"><canvas id="paDaily"></canvas></div></div>
+      <div class="card"><h3>By payment method</h3><div id="paGateways"></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Refunds</h3><div style="max-height:380px;overflow:auto"><table><thead><tr><th>Order</th><th>Date</th><th>Reason / note</th><th class="r">Amount</th></tr></thead><tbody id="paRefunds"></tbody></table></div></div>
+      <div class="card"><h3>Failed payments</h3><div style="max-height:380px;overflow:auto"><table><thead><tr><th>Order</th><th>Date</th><th>Method</th><th>Error</th><th class="r">Amount</th></tr></thead><tbody id="paFails"></tbody></table></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Authorised, waiting to be captured</h3><p class="mu" style="margin:-6px 0 8px;font-size:12px">Capture these in Shopify before the authorisation expires (usually 7 days).</p><div style="max-height:320px;overflow:auto"><table><thead><tr><th>Order</th><th>Placed</th><th class="r">Amount</th></tr></thead><tbody id="paAwaiting"></tbody></table></div></div>
+      <div class="card"><h3>Shopify Payments payouts</h3><div id="paPayouts"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-journey" hidden>
+  <div class="top">
+    <div><h1>Customer journey</h1><div class="sub">How shoppers find PixMagic, and where they drop off</div></div>
+    <div><button class="btn" id="jrExport">⤓ Export CSV</button> <button class="btn pri" id="jrRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="filters">
+    <div class="seg" id="jrSeg"><button data-d="7">7 days</button><button data-d="30" class="on">30 days</button><button data-d="90">90 days</button><button data-d="365">12 months</button></div>
+    <input type="date" id="jrFrom"> <span class="mu">to</span> <input type="date" id="jrTo">
+  </div>
+  <div class="err" id="jrErr"></div>
+  <div class="card" id="jrNoAnalytics" hidden style="margin-bottom:18px">
+    <b>Visitor tracking isn't switched on yet.</b>
+    <span class="mu">The visitor funnel, traffic sources and devices need Shopify's analytics permission: add <code>read_reports</code> to the app's access scopes, release, and approve it in the store admin. The order-based sections below work already.</span>
+  </div>
+  <div id="jrContent">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+      <div class="card"><div>👀 Visitors</div><div class="kv" id="jrVisitors">–</div></div>
+      <div class="card"><div>🎯 Conversion rate</div><div class="kv" id="jrConv">–</div><span class="vs">visitors who bought</span></div>
+      <div class="card"><div>⏱ Avg days to buy</div><div class="kv" id="jrDays">–</div><span class="vs" id="jrVisits"></span></div>
+      <div class="card"><div>🆕 First-time buyers</div><div class="kv" id="jrNew">–</div><span class="vs" id="jrRepeat"></span></div>
+      <div class="card"><div>🛒 Abandoned checkouts</div><div class="kv" id="jrAband">–</div><span class="vs" id="jrAbandVal"></span></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Conversion funnel</h3><div id="jrFunnel"></div></div>
+      <div class="card"><h3>Conversion rate per day</h3><div style="height:230px" id="jrDailyWrap"><canvas id="jrDaily"></canvas></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Visitors by traffic source</h3><div style="overflow:auto"><table><thead><tr><th>Source</th><th class="r">Visitors</th><th class="r">Purchases</th><th class="r">Conversion</th></tr></thead><tbody id="jrSources"></tbody></table></div></div>
+      <div class="card"><h3>Visitors by device</h3><div id="jrDevices"></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>How long buyers take to order</h3><p class="mu" style="margin:-6px 0 8px;font-size:12px">Time from their first visit to placing the order.</p><div style="height:220px"><canvas id="jrTime"></canvas></div></div>
+      <div class="card"><h3>Where buyers came from</h3>
+        <div class="seg" id="jrTouch" style="display:inline-flex;margin-bottom:10px"><button data-t="first" class="on">First visit</button><button data-t="last">Last visit before buying</button></div>
+        <table><thead><tr><th>Source</th><th class="r">Orders</th><th class="r">Sales</th></tr></thead><tbody id="jrTouchBody"></tbody></table></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3>Top landing pages for buyers</h3><table><thead><tr><th>Page</th><th class="r">Orders</th><th class="r">Sales</th></tr></thead><tbody id="jrLanding"></tbody></table></div>
+      <div class="card"><h3>Recent abandoned checkouts</h3><p class="mu" style="margin:-6px 0 8px;font-size:12px">Copy a recovery link to send the shopper back to their cart.</p><div style="max-height:360px;overflow:auto"><table><thead><tr><th>Checkout</th><th>Items</th><th class="r">Value</th><th class="r"></th></tr></thead><tbody id="jrAbandList"></tbody></table></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="view-attention" hidden>
+  <div class="top">
+    <div><h1>Needs attention</h1><div class="sub">Everything that needs action, most urgent first</div></div>
+    <div><span class="mu" id="atUpdated" style="font-size:12px;margin-right:8px"></span><button class="btn pri" id="atRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="err" id="atErr" style="margin-top:16px"></div>
+  <div id="atContent" style="margin-top:18px">
+    <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card"><div>🔴 Urgent</div><div class="kv bad" id="atHigh">–</div><span class="vs">act today</span></div>
+      <div class="card"><div>🟠 Soon</div><div class="kv" style="color:#b57b00" id="atMed">–</div><span class="vs">this week</span></div>
+      <div class="card"><div>🟢 Opportunities</div><div class="kv ok" id="atLow">–</div><span class="vs">revenue to recover</span></div>
+    </div>
+    <div id="atList" style="margin-top:18px"></div>
+    <div class="card" id="atClearWrap" style="margin-top:18px"><h3>✅ All clear</h3><div id="atClear"></div></div>
+  </div>
+</section>
+
+<section id="view-connections" hidden>
+  <div class="top">
+    <div><h1>Data connections</h1><div class="sub">Where the dashboard gets its data, and what still needs setting up</div></div>
+    <div><button class="btn pri" id="cnRefresh"><i data-ic="refresh" data-size="18"></i>Re-check</button></div>
+  </div>
+  <div class="err" id="cnErr" style="margin-top:16px"></div>
+  <div id="cnContent" style="margin-top:18px">
+    <div class="grid g2">
+      <div class="card"><h3><span class="kt"><i data-ic="shopify" data-size="24"></i>Shopify</span><span id="cnShopStatus"></span></h3><div id="cnShop"></div></div>
+      <div class="card"><h3><span class="kt"><i data-ic="bars" data-size="24"></i>Visitor tracking</span><span id="cnVisStatus"></span></h3><div id="cnVis"></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card"><h3><span class="kt"><i data-ic="mail" data-size="24"></i>Email</span><span id="cnMailStatus"></span></h3><div id="cnMail"></div></div>
+      <div class="card"><h3><span class="kt"><i data-ic="whatsapp" data-size="24"></i>WhatsApp</span><span id="cnWaStatus"></span></h3><div id="cnWa"></div></div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <h3><span class="kt"><i data-ic="puzzle" data-size="24"></i>App expenses</span><span id="cnExpStatus"></span></h3>
+      <p class="mu" style="margin:-6px 0 12px;font-size:13px">Shopify doesn't share what other apps charge you, so list your app subscriptions and tools here to see what they cost against your sales.</p>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:14px">
+        <div class="card" style="padding:12px"><small class="mu">Monthly app costs</small><div style="font-size:22px;font-weight:700" id="cnExpTotal">–</div></div>
+        <div class="card" style="padding:12px"><small class="mu">Sales, last 30 days</small><div style="font-size:22px;font-weight:700" id="cnExpSales">–</div></div>
+        <div class="card" style="padding:12px"><small class="mu">Apps as % of sales</small><div style="font-size:22px;font-weight:700" id="cnExpPct">–</div></div>
+      </div>
+      <div style="overflow:auto"><table><thead><tr><th>App or service</th><th>Category</th><th class="r">Cost</th><th class="r">Per month</th><th class="r"></th></tr></thead><tbody id="cnExpList"></tbody></table></div>
+      <form id="cnExpForm" class="form admin-only" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:16px">
+        <label style="margin:0">App or service<input id="exName" required maxlength="80" placeholder="e.g. Klaviyo"></label>
+        <label style="margin:0">Category<select id="exCat"><option>App</option><option>Marketing</option><option>Shipping</option><option>Reviews</option><option>Theme</option><option>Other</option></select></label>
+        <label style="margin:0">Cost (A$)<input id="exAmt" type="number" min="0" step="0.01" required></label>
+        <label style="margin:0">Billed<select id="exBill"><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label>
+        <button class="btn pri">Add</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section id="view-customers" hidden>
+  <div class="top">
+    <div><h1>Customers</h1><div class="sub">Who buys from PixMagic, how often, and how much</div></div>
+    <div><button class="btn" id="cuExport">⤓ Export CSV</button> <button class="btn pri" id="cuRefresh">⟳ Refresh</button></div>
+  </div>
+  <div class="err" id="cuErr" style="margin-top:16px"></div>
+  <div class="card" id="cuScope" hidden style="margin-top:18px">
+    <h3>Customer access isn't switched on yet</h3>
+    <p class="mu" style="line-height:1.6;margin:0">The Shopify app needs the <b>read_customers</b> permission to show this page.<br>
+    1. Shopify Dev Dashboard → your app → <b>Versions</b> → add <code>read_customers</code> to the access scopes and release.<br>
+    2. Under <b>API access → Protected customer data</b>, request access (add name, email and address fields to show contact details).<br>
+    3. Approve the updated permissions in PixMagic's Shopify admin, then press Refresh here.</p>
+  </div>
+  <div id="cuContent" style="margin-top:18px">
+    <div class="grid k4">
+      <div class="card"><div>👥 Total customers</div><div class="kv" id="cuTotal">–</div><span class="vs" id="cuNew"></span></div>
+      <div class="card"><div>🔁 Returning customer rate</div><div class="kv" id="cuRate">–</div><span class="vs" id="cuRet"></span></div>
+      <div class="card"><div>💰 Avg spend per customer (12 mo)</div><div class="kv" id="cuAvg">–</div><span class="vs" id="cuBuyers"></span></div>
+      <div class="card"><div>💤 Lapsed buyers (no order 6+ mo)</div><div class="kv" id="cuLapsed">–</div><span class="vs" id="cuSubs"></span></div>
+    </div>
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card">
+        <h3>All customers</h3>
+        <div class="filters" style="margin:0 0 12px">
+          <input id="cuSearch" type="search" placeholder="Search name, email, city or tag…" class="btn" style="flex:1;min-width:180px;text-align:left;cursor:text">
+          <select id="cuSort" class="btn"><option value="newest">Newest first</option><option value="updated">Recently active</option><option value="name">Name A–Z</option></select>
+        </div>
+        <div style="overflow:auto"><table><thead><tr><th>Customer</th><th>Location</th><th class="r">Orders</th><th class="r">Total spent</th><th class="r">Since</th></tr></thead><tbody id="cuList"></tbody></table></div>
+        <button class="btn" id="cuMore" style="margin-top:12px;width:100%" hidden>Load more</button>
+      </div>
+      <div class="card"><h3>Top spenders (last 12 months)</h3><div id="cuTop"></div></div>
+    </div>
+  </div>
+</section>
+
+<div id="cuDrawer" hidden style="position:fixed;inset:0;background:#0006;z-index:50;display:flex;justify-content:flex-end">
+  <div style="background:#fff;width:min(520px,100%);height:100%;overflow:auto;padding:24px" id="cuDetail"></div>
+</div>
+
+<section id="view-settings" hidden>
+  <div class="top">
+    <div><h1>Settings</h1><div class="sub">Store connection, dashboard preferences and team access</div></div>
+  </div>
+  <div class="err" id="stErr" style="margin-top:16px"></div>
+  <div class="ok-msg" id="stOk"></div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card">
+      <h3>Shopify connection <button class="btn admin-only" id="stReconnect">⟳ Reconnect &amp; clear cache</button></h3>
+      <div id="stConn" class="na">Checking connection…</div>
+    </div>
+    <div class="card">
+      <h3>Dashboard preferences</h3>
+      <form id="stPrefs" class="form">
+        <label>Default date range
+          <select id="stPeriod"><option value="day">Day</option><option value="month">Month</option><option value="year">Year</option></select></label>
+        <label>Auto-refresh every (seconds)<input id="stRefresh" type="number" min="15" max="3600"></label>
+        <label>Low-stock alert when inventory is below<input id="stLow" type="number" min="0" max="10000"></label>
+        <label>Flag paid orders not shipped after (days)<input id="stShip" type="number" min="0" max="60"></label>
+        <label>Keep users signed in for (hours)<input id="stSession" type="number" min="1" max="720"></label>
+        <label class="inline"><input id="stCompare" type="checkbox"> Compare with previous period by default</label>
+        <button class="btn pri admin-only">Save preferences</button>
+        <small class="mu viewer-only">Only admins can change preferences.</small>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card admin-only">
+      <h3>Team members</h3>
+      <table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th class="r"></th></tr></thead><tbody id="stUsers"></tbody></table>
+      <h3 style="margin-top:22px">Invite a team member</h3>
+      <form id="stAddUser" class="form">
+        <label>Name<input id="nuName" required></label>
+        <label>Email<input id="nuEmail" type="email" required></label>
+        <label>Temporary password (min 10 characters)<input id="nuPass" type="password" minlength="10" autocomplete="new-password" required></label>
+        <label>Role<select id="nuRole"><option value="viewer">Viewer — can view dashboards</option><option value="admin">Admin — can also manage settings &amp; team</option></select></label>
+        <button class="btn pri">Add member</button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Change your password</h3>
+      <form id="stPw" class="form">
+        <label>Current password<input id="pwCur" type="password" autocomplete="current-password" required></label>
+        <label>New password (min 10 characters)<input id="pwNew" type="password" minlength="10" autocomplete="new-password" required></label>
+        <label>Confirm new password<input id="pwNew2" type="password" minlength="10" autocomplete="new-password" required></label>
+        <button class="btn pri">Update password</button>
+      </form>
+      <p class="mu" style="font-size:12px;margin-top:14px">Shopify API credentials are kept in the server's <code>.env</code> file and are never shown or editable here.</p>
+    </div>
+  </div>
+  <div class="card admin-only" style="margin-top:18px">
+    <h3>Activity log <span class="mu" style="font-weight:400;font-size:12px">Sign-ins, team and settings changes · latest 200</span></h3>
+    <div style="max-height:420px;overflow:auto"><table><thead><tr><th>When</th><th>Who</th><th>What</th><th>Details</th></tr></thead><tbody id="stAudit"></tbody></table></div>
+  </div>
+</section>
+  <footer><span><b>PixMagic</b> Insights &nbsp; Australian wall art for a more beautiful tomorrow.</span><span>Live data from Shopify</span></footer>
+</main>
+</div>
+
+<script src="icons.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+// Send the user to the sign-in page whenever their session has expired
+const _fetch = window.fetch;
+window.fetch = async (...a) => { const r = await _fetch(...a); if (r.status === 401) location.href = 'login.html'; return r; };
+let cur = 'AUD', data = null, charts = {};
+// en-GB prints AUD as "A$" (en-AU prints a bare "$"); number formatting is identical
+const fmt = (n) => n == null ? '–' : new Intl.NumberFormat('en-GB', { style: 'currency', currency: cur }).format(n);
+const iso = (d) => d.toLocaleDateString('en-CA');
+const ini = (s) => (s || '?').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const chg = (v, unit = '%') => v == null ? '<span class="vs">no comparison data</span>'
+  : `<span class="chg ${v < 0 ? 'neg' : ''}">${v < 0 ? '↓' : '↑'} ${Math.abs(v).toFixed(0)}${unit}</span><span class="vs">vs previous period</span>`;
+
+function setPeriod(p) {
+  const t = new Date(); let f = new Date(t);
+  if (p === 'month') f = new Date(t.getFullYear(), t.getMonth(), 1);
+  if (p === 'year') f = new Date(t.getFullYear(), 0, 1);
+  if (p !== 'custom') { $('from').value = iso(f); $('to').value = iso(t); }
+  document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+}
+
+async function load(force) {
+  $('content').classList.add('loading'); $('refreshBtn').disabled = true; $('err').style.display = 'none';
+  try {
+    const r = await fetch(`/api/overview?from=${$('from').value}&to=${$('to').value}${force ? '&refresh=1' : ''}`);
+    const j = await r.json(); if (!r.ok) throw new Error(j.error || r.statusText);
+    data = j; render(j);
+  } catch (e) { $('err').textContent = 'Could not load Shopify data: ' + e.message; $('err').style.display = 'block'; }
+  $('content').classList.remove('loading'); $('refreshBtn').disabled = false;
+}
+
+function spark(id, pts, color = '#13a079') {
+  charts[id]?.destroy();
+  charts[id] = new Chart($(id), { type: 'line', data: { labels: pts.map((_, i) => i), datasets: [{ data: pts, borderColor: color, borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: color + '22', tension: .35 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } } });
+}
+
+function render(d) {
+  cur = d.shop.currency;
+  $('storeBox').innerHTML = `${esc(d.shop.name)}<small>${esc(d.shop.country || '')} • ${esc(cur)}</small>`;
+  window.shopInfo = d.shop; // used by the timezone selector and store menu (chrome.js)
+  if (window.onShopInfo) onShopInfo(d.shop);
+  $('updated').textContent = 'Live • updated ' + new Date(d.fetchedAt).toLocaleTimeString('en-AU');
+
+  const k = d.kpis, cmp = $('cmp').checked;
+  $('kSales').textContent = fmt(k.sales); $('cSales').innerHTML = cmp ? chg(k.salesChange) : '';
+  $('kOrders').textContent = k.orders; $('cOrders').innerHTML = cmp ? chg(k.ordersChange) : '';
+  $('kAov').textContent = fmt(k.aov); $('cAov').innerHTML = cmp ? chg(k.aovChange) : '';
+  $('kRet').textContent = k.returningPct == null ? 'N/A' : k.returningPct.toFixed(0) + '%';
+  $('cRet').innerHTML = k.returningPct == null ? '<span class="vs">needs read_customers scope</span>' : (cmp ? chg(k.returningChange, ' pts') : '');
+  const vals = d.trend.current.map(p => p.value);
+  spark('s1', vals); spark('s2', vals); spark('s3', vals); spark('s4', vals);
+
+  charts.trend?.destroy();
+  const ds = [{ label: `${d.range.from} – ${d.range.to}`, data: vals, borderColor: '#0f7a5c', backgroundColor: '#13a07922', fill: true, tension: .35, pointRadius: 0, borderWidth: 2.5 }];
+  if (cmp) ds.push({ label: `${d.range.prevFrom} – ${d.range.prevTo}`, data: d.trend.previous.map(p => p.value), borderColor: '#8fcfb6', borderDash: [5, 5], pointRadius: 0, borderWidth: 2, tension: .35 });
+  charts.trend = new Chart($('trend'), { type: 'line', data: { labels: d.trend.current.map(p => new Date(p.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })), datasets: ds },
+    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } }, tooltip: { callbacks: { label: c => ' ' + fmt(c.parsed.y) } } },
+      scales: { y: { ticks: { callback: v => fmt(v) }, grid: { color: '#eef2f0' } }, x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } } } } });
+
+  const J = d.journey;
+  $('journeyBody').innerHTML = !J ? '<div class="na">Visitor data isn\'t available yet. Grant the app <b>read_reports</b> (analytics) access to show the funnel. Purchases this period: <b>' + k.orders + '</b></div>'
+    : [['Visitors', J.visitors], ['Added to cart', J.addedToCart], ['Checkout started', J.checkoutStarted], ['Purchased', J.purchased]].map(([l, v]) => {
+      const p = J.visitors ? v / J.visitors * 100 : 0;
+      return `<div class="frow"><span>${l}</span><b class="r">${v.toLocaleString()}</b><div class="bar"><i style="width:${p}%"></i></div><span class="mu">${p.toFixed(0)}%</span></div>`;
+    }).join('');
+
+  const pay = (s) => { const w = ['PENDING', 'AUTHORIZED', 'PARTIALLY_PAID'].includes(s), b = ['VOIDED', 'EXPIRED', 'REFUNDED'].includes(s);
+    return `<span class="pill ${b ? 'b' : w ? 'w' : ''}">● ${esc((s || '').replace(/_/g, ' ').toLowerCase())}</span>`; };
+  const ful = (s) => `<span class="pill ${s === 'FULFILLED' ? '' : 'w'}">● ${esc((s || '').replace(/_/g, ' ').toLowerCase())}</span>`;
+  $('ordersBody').innerHTML = d.recentOrders.length ? d.recentOrders.map(o => `<tr><td class="on-name">${esc(o.name)}</td><td><span class="av" title="${esc(o.customer || '')}">${o.customer ? ini(o.customer) : '–'}</span></td>
+    <td>${new Date(o.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}</td><td>${pay(o.payment)}</td><td>${ful(o.fulfilment)}</td><td class="r">${fmt(o.total)}</td></tr>`).join('')
+    : '<tr><td colspan="6" class="na">No orders in this period.</td></tr>';
+
+  $('prodBody').innerHTML = d.bestSellers.length ? '<div class="prow mu" style="font-size:12px"><span></span><span>Product</span><span>Units</span><span></span><span>% sales</span></div>' +
+    d.bestSellers.map(p => `<div class="prow">${p.image ? `<img src="${esc(p.image)}&width=80" alt="">` : '<div class="ph"></div>'}<span>${esc(p.title)}</span><b>${p.units}</b><div class="bar" style="height:10px"><i style="width:${p.share}%"></i></div><span class="mu">${p.share.toFixed(0)}%</span></div>`).join('')
+    : '<div class="na">No sales in this period.</div>';
+
+  const P = d.payments, pp = (n) => P.total ? (n / P.total * 100).toFixed(0) + '%' : '–';
+  $('payBody').innerHTML = [[icon('check', 20, 'ok'), 'Successful payments', P.paid], [icon('x', 20, 'bad'), 'Failed payments', P.failed], [icon('undo', 20), 'Refunded orders', P.refunded]]
+    .map(([ic, l, v]) => `<div class="lrow"><span class="kt">${ic}${l}</span><span><b>${v}</b> <span class="mu" style="display:inline-block;min-width:48px;text-align:right">${pp(v)}</span></span></div>`).join('');
+
+  const C = d.customers;
+  if (C.total == null) $('custBody').innerHTML = '<div class="na">Add the <b>read_customers</b> scope to the Shopify app to see new vs returning customers.</div>';
+  else {
+    const cp = (n) => C.total ? (n / C.total * 100).toFixed(0) + '%' : '–';
+    $('custBody').innerHTML = `<div style="width:130px;height:130px;position:relative;flex:none"><canvas id="donut"></canvas>
+        <div class="donut-c"><b>${C.total}</b><small>Total customers</small></div></div><div style="flex:1">
+      <div class="lrow"><span><span class="sw" style="background:#0f5c46"></span>New customers</span><span><b>${C.new}</b> <span class="mu">${cp(C.new)}</span></span></div>
+      <div class="lrow"><span><span class="sw" style="background:#6fd3ac"></span>Returning customers</span><span><b>${C.returning}</b> <span class="mu">${cp(C.returning)}</span></span></div></div>`;
+    charts.donut?.destroy();
+    charts.donut = new Chart($('donut'), { type: 'doughnut', data: { labels: ['New', 'Returning'], datasets: [{ data: [C.new, C.returning], backgroundColor: ['#0f5c46', '#6fd3ac'], borderWidth: 0 }] }, options: { cutout: '72%', plugins: { legend: { display: false } } } });
+  }
+
+  const A = d.attention;
+  const arow = (ic, label, v, note, linkText) => `<div class="lrow"><span class="kt">${icon(ic, 20)}${label}</span>
+    <span style="display:flex;gap:18px;align-items:center">${v == null ? `<small class="mu">${note}</small>` : `<b class="bad">${v}</b>`}
+    <a class="on-name link" data-go="attention">${linkText} ${icon('arrowR', 16)}</a></span></div>`;
+  $('attBody').innerHTML = arow('box', 'Low stock products', A.lowStock, 'needs read_inventory', 'Review')
+    + arow('cart', 'Abandoned checkouts', A.abandoned, 'unavailable', 'View') + arow('card', 'Payment failures', A.failed, '', 'View');
+
+  const hs = (s) => s === 'connected' ? '<small class="ok">● Connected</small>' : s === 'setup needed' ? '<small class="warn">● Setup needed</small>' : '<small class="bad">● Not connected</small>';
+  $('healthBody').innerHTML = `<div class="kt" style="flex:1.4;min-width:220px">${icon('layers', 24)}<div><b>Data source health</b><small class="mu" style="display:block">Keep your connections healthy for the most accurate insights.</small></div></div>` +
+    [['shopify', 'Shopify', d.health.shopify], ['bars', 'Visitor tracking', d.health.analytics], ['mail', 'Email &amp; WhatsApp', d.health.email], ['puzzle', 'App expenses', d.health.expenses]]
+      // WhatsApp has no connection yet, so a connected email source is only a partial connection
+      .map(([ic, n, s]) => `<a class="kt hitem" data-go="connections">${icon(ic, 24)}<div>${n}${ic === 'mail' && s === 'connected' ? '<small class="warn">● Email only</small>' : hs(s)}</div></a>`).join('');
+}
+
+function exportCsv() {
+  if (!data) return;
+  const rows = [['PixMagic Insights report', `${data.range.from} to ${data.range.to}`], [],
+    ['Total sales', data.kpis.sales.toFixed(2)], ['Orders', data.kpis.orders], ['Average order value', data.kpis.aov.toFixed(2)],
+    ['Returning customers %', data.kpis.returningPct?.toFixed(1) ?? 'N/A'], [], ['Date', 'Sales'], ...data.trend.current.map(p => [p.date, p.value]),
+    [], ['Product', 'Units', 'Revenue'], ...data.bestSellers.map(p => [p.title, p.units, p.revenue.toFixed(2)]),
+    [], ['Order', 'Customer', 'Date', 'Payment', 'Fulfilment', 'Total'], ...data.recentOrders.map(o => [o.name, o.customer || '', o.date, o.payment, o.fulfilment, o.total])];
+  const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `pixmagic-report-${data.range.from}-${data.range.to}.csv`; a.click();
+}
+
+document.querySelectorAll('#seg button').forEach(b => b.onclick = () => { setPeriod(b.dataset.p); if (b.dataset.p !== 'custom') load(); });
+['from', 'to'].forEach(id => $(id).onchange = () => { setPeriod('custom'); load(); });
+$('cmp').onchange = () => data && render(data);
+$('refreshBtn').onclick = () => load(true);
+$('exportBtn').onclick = exportCsv;
+</script>
+<script src="pages.js"></script>
+<script src="orders.js"></script>
+<script src="products.js"></script>
+<script src="payments.js"></script>
+<script src="journey.js"></script>
+<script src="attention.js"></script>
+<script src="customers.js"></script>
+<script src="connections.js"></script>
+<script src="chrome.js"></script>
+<script src="settings.js"></script>
+<div id="demoBadge" title="This is a demo with made-up sample data. Changes are not saved."
+  style="position:fixed;right:12px;bottom:12px;z-index:9999;background:rgba(15,92,70,.92);color:#fff;font:600 12px/1 Inter,system-ui,sans-serif;
+  padding:7px 11px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none">Demo · sample data</div>
+</body>
+</html>
