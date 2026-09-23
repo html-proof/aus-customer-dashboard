@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in · PixMagic Insights</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0f7a5c;--gl:#e6f4ee;--bg:#f6f8f7;--line:#e7ecea;--tx:#132a22;--mu:#6b7a74;--red:#e03d3d}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:16px}
+.box{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px}
+.logo{font-weight:700;font-size:24px;display:flex;gap:8px;align-items:center;margin-bottom:24px}.logo small{display:block;font-weight:400;font-size:14px;color:var(--mu)}
+h1{font-size:20px;margin:0 0 6px}p{color:var(--mu);margin:0 0 20px;font-size:14px;line-height:1.5}
+label{display:block;font-size:13px;font-weight:500;margin:14px 0 6px}
+input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font:inherit}
+input:focus{outline:2px solid var(--gl);border-color:var(--g)}
+button{width:100%;margin-top:22px;padding:12px;border:0;border-radius:8px;background:var(--g);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6}
+.err{background:#fde8e8;color:var(--red);padding:10px 12px;border-radius:8px;font-size:13px;margin-top:16px;display:none}
+.foot{color:var(--mu);font-size:12px;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">▲ <div>PixMagic<small>Insights</small></div></div>
+  <form id="form">
+    <h1 id="title">Sign in</h1>
+    <p id="intro">Sign in to view your store dashboard.</p>
+    <div id="nameRow" hidden><label for="name">Your name</label><input id="name" autocomplete="name"></div>
+    <label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
+    <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
+    <div id="confirmRow" hidden><label for="confirm">Confirm password</label><input id="confirm" type="password" autocomplete="new-password"></div>
+    <button id="submit">Sign in</button>
+    <div class="err" id="err"></div>
+  </form>
+  <div class="foot">🔒 Private workspace — only your team can access this data.</div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+let setup = false;
+fetch('/api/setup-status').then(r => r.json()).then(d => {
+  setup = d.needsSetup;
+  if (!setup) return;
+  $('title').textContent = 'Create your admin account';
+  $('intro').textContent = 'First run: create the admin account. You can invite your team from Settings afterwards.';
+  $('nameRow').hidden = $('confirmRow').hidden = false;
+  $('password').autocomplete = 'new-password';
+  $('password').minLength = 10;
+  $('submit').textContent = 'Create account';
+});
+$('form').onsubmit = async (e) => {
+  e.preventDefault();
+  $('err').style.display = 'none';
+  if (setup && $('password').value !== $('confirm').value) return showErr('Passwords don\'t match.');
+  $('submit').disabled = true;
+  try {
+    const r = await fetch(setup ? '/api/setup' : '/api/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: $('email').value, password: $('password').value, name: $('name').value }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'Sign-in failed');
+    location.href = '/';
+  } catch (err) { showErr(err.message); }
+  $('submit').disabled = false;
+};
+function showErr(m) { $('err').textContent = m; $('err').style.display = 'block'; }
+</script>
+</body>
+</html>
