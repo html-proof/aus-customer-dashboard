@@ -10,8 +10,9 @@ No dependencies to install (Node 18+).
 On first visit you'll be asked to **create the admin account**. Invite the rest of your team from **Settings → Team members** (roles: Admin or Viewer).
 
 ## Login & security
-- Passwords are hashed with scrypt; users and preferences live in `data/` (git-ignored — back it up, don't share it).
-- Sessions are HttpOnly, SameSite=Strict cookies. Restarting the server signs everyone out.
+- Passwords are hashed with scrypt; users, preferences, sessions, app expenses and the activity log live in `data/` (git-ignored — back it up, don't share it).
+- Sessions are HttpOnly, SameSite=Strict cookies, kept across restarts (only a SHA-256 of each token is stored).
+- Admins can reset a team member's password (Settings → Team members); every sign-in, team and settings change is recorded in Settings → Activity log.
 - 5 failed logins per email/IP locks that combination out for 15 minutes.
 - When hosting online, put it behind HTTPS and set `COOKIE_SECURE=true` in `.env`.
 
